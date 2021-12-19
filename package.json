@@ -20,7 +20,9 @@
   "contributors": "https://github.com/TryGhost/Ghost/graphs/contributors",
   "license": "MIT",
   "scripts": {
-    "start": "node index",
+    "start": "cross-env NODE_ENV=production nohup node index --name $npm_package_name > /dev/null 2>&1 &",
+    "restart": "npm stop && npm start",
+    "stop": "pkill -f $npm_package_name",
     "dev": "grunt dev",
     "dev:debug": "DEBUG=ghost:* grunt dev",
     "setup": "yarn install && knex-migrator init && grunt symlink && grunt init || (exit 0)",
@@ -119,6 +121,7 @@
     "connect-slashes": "1.4.0",
     "cookie-session": "1.4.0",
     "cors": "2.8.5",
+    "cross-env": "^7.0.3",
     "downsize": "0.0.8",
     "express": "4.17.2",
     "express-brute": "1.0.1",
