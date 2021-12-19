@@ -25,9 +25,9 @@
 mysql -p
 Enter password:
 
-MariaDB [(none)]> create database <dbname>
-MariaDB [(none)]> create user <dbuser>@localhost identified by '<dbpassword>'
-MariaDB [(none)]> grant all privileges on <dbname>.* to ghost@localhost
+MariaDB [(none)]> create database <DBName>
+MariaDB [(none)]> create user <DBUser>@<DBHost> identified by '<DBPassword>'
+MariaDB [(none)]> grant all privileges on <DBName>.* to <DBUser>@<DBHost>
 MariaDB [(none)]> flush privileges
 ```
 
@@ -49,8 +49,8 @@ MariaDB [(none)]> flush privileges
 	# origin remote를 upstream으로 변경: upstream <-> TryGhost/Ghost
 	git remote rename origin upstream
 	
-	# origin remote 추가: origin <-> <GithubUsername>/Ghost
-	git remote add origin git@github.com:<GithubUsername>/Ghost.git
+	# origin remote 추가: origin <-> <Github Username>/Ghost
+	git remote add origin git@github.com:<Github Username>/Ghost.git
 
 	# Guthub에 Ghost 레포지토리 생성: gh(Github CLI) 설치 필요 (https://cli.github.com/manual/gh)
 	gh repo create Ghost --public
@@ -68,8 +68,8 @@ MariaDB [(none)]> flush privileges
 	# origin remote를 upstream으로 변경: upstream <-> TryGhost/Admin
 	git remote rename origin upstream
 	
-	# origin remote 추가: origin <-> <GithubUsername>/Ghost-Admin
-	git remote add origin git@github.com:<GithubUsername>/Ghost-Admin.git
+	# origin remote 추가: origin <-> <Github Username>/Ghost-Admin
+	git remote add origin git@github.com:<Github Username>/Ghost-Admin.git
 	
 	# Guthub에 Ghost 레포지토리 생성: gh(Github CLI) 설치 필요 (https://cli.github.com/manual/gh)
 	gh repo create Ghost-Admin --public
@@ -107,7 +107,7 @@ MariaDB [(none)]> flush privileges
 
 		```json
 		{
-			"url": "http(s)://<BlogHostDomain or BlogHostIp>",
+			"url": "http(s)://<Blog Host Domain or Blog Host IP>",
 			"server": {
 				"host": "127.0.0.1",
 				"port": 2368,
@@ -128,10 +128,10 @@ MariaDB [(none)]> flush privileges
 			"database": {
 				"client": "mysql",
 				"connection": {
-					"host"     : "<dbhost>",
-					"user"     : "<dbuser>",
-					"password" : "<dbpassword>",
-					"database" : "<dbname>"
+					"host"     : "<DBHost>",
+					"user"     : "<DBUser>",
+					"password" : "<DBPassword>",
+					"database" : "<DBName>"
 				}
 			},
 
@@ -190,7 +190,7 @@ MariaDB [(none)]> flush privileges
 	```sh
 	server {
 		listen       80;
-		server_name  <YourBlogDoamin>;
+		server_name  <Blog Host Domain or Blog Host IP>;
 
 		location / {
 			proxy_set_header Host $host;
@@ -227,7 +227,7 @@ MariaDB [(none)]> flush privileges
 6.	test
 
 	```sh
-	curl -I <YourBlogDoamin>
+	curl -I <Blog Host Domain or Blog Host IP>
 	
 	HTTP/1.1 200 OK
 	Server: nginx/1.21.4
@@ -246,29 +246,86 @@ MariaDB [(none)]> flush privileges
 
 ### Create a New User: Running Ghost as a Separate User
 
+```sh
+
+# 보안을 위해서 Ghost 블로그가 설치된 디렉토리와 파일에만 접근할 수 있는 계정과 그룹을 생성한다.
+groupadd ghost
+useradd -M -g ghost ghost
+
+# 설치 디렉토리와 파일들의 소유그룹과 소유계정을 전부 변경한다.
+chown -R ghost:ghost <Directory Installed Ghost>
+
+```
 
 ### Running Ghost as a System Service
-1.	systemd unit file: ghost.service
+1.	add scrips in package.json
+
+	```sh
+	
+	"scripts": {
+    	"start": "cross-env NODE_ENV=production node index --name $npm_package_name",
+    	"restart": "npm stop && npm start",
+    	"stop": "pkill -f $npm_package_name",
+		
+		[...skip...]
+	},
 	
 	```
+
+2.	systemd unit file: /usr/lib/systemd/system/ghost.service
+	
+	```sh
 	[Unit]
 	Description=Ghost
+	After=syslog.target
 	After=network.target
 
 	[Service]
 	Type=simple
 
-	WorkingDirectory=<YoutGostInstallDirectory>
 	User=ghost
 	Group=ghost
 
-	ExecStart=<YourNodexecutable> start --production
-	ExecStop=<YourNPMExecutable> stop --production
+	WorkingDirectory=<Directory Installed Ghost>
+
+	ExecStart=<npm Executable> start
+	ExecStop=<npm Executable> stop
 	Restart=always
+
+	StandardOutput=syslog
 	SyslogIdentifier=Ghost
+	TimeoutSec=90
+
+	Environment=PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:<Directory Installed Node>/bin
 
 	[Install]
 	WantedBy=multi-user.target
 	```
 	
-3.	1
+3.	enable service
+
+	```
+	systemctl enable ghost
+	```
+	
+4.	start &amp; stop Ghost Service
+
+	```
+	systemctl start ghost
+	systemctl stop ghost
+	systemctl start ghost
+	systemctl restart ghost
+	systemctl status ghost
+	
+	● ghost.service - Ghost
+	   Loaded: loaded (/usr/lib/systemd/system/ghost.service; enabled; vendor preset: disabled)
+	   Active: active (running) since 일 2021-12-19 16:13:54 KST; 24s ago
+	  Process: 12598 ExecStop=/usr/local/kickscar/node/bin/npm stop (code=exited, status=0/SUCCESS)
+ 	 Main PID: 12616 (npm)
+   	   CGroup: /system.slice/ghost.service
+               ├─12616 npm
+               ├─12627 node /usr/local/kickscar/Ghost/node_modules/.bin/cross-env NODE_ENV=production node index --name ghost
+               └─12634 node index --name ghost
+	
+	```
+
