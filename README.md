@@ -1,96 +1,274 @@
-<p align="center">
-  <a href="https://ghost.org/">
-    <img src="https://user-images.githubusercontent.com/120485/43974508-b64b2fe8-9cd2-11e8-8e58-707254b8817c.png" width="140px" alt="Ghost" />
-  </a>
-</p>
-<p align="center">
-    <a href="https://ghost.org/">Ghost.org</a> |
-    <a href="https://ghost.org/features/">Features</a> |
-    <a href="https://ghost.org/customers/">Showcase</a> |
-    <a href="https://forum.ghost.org">Forum</a> |
-    <a href="https://ghost.org/docs/">Docs</a> |
-    <a href="https://github.com/TryGhost/Ghost/blob/master/.github/CONTRIBUTING.md">Contributing</a> |
-    <a href="https://twitter.com/ghost">Twitter</a>
-    <br /><br />
-    <a href="https://ghost.org/">
-        <img src="https://img.shields.io/badge/downloads-2M-brightgreen.svg" alt="Downloads" />
-    </a>
-    <a href="https://github.com/TryGhost/Ghost/releases/">
-        <img src="https://img.shields.io/github/release/TryGhost/Ghost.svg" alt="Latest release" />
-    </a>
-    <a href="https://github.com/TryGhost/Ghost/actions">
-        <img src="https://github.com/TryGhost/Ghost/workflows/Test%20Suite/badge.svg?branch=main" alt="Build status" />
-    </a>
-    <a href="https://github.com/TryGhost/Ghost/contributors/">
-        <img src="https://img.shields.io/github/contributors/TryGhost/Ghost.svg" alt="Contributors" />
-    </a>
-</p>
-<p align="center">Love open source? We're hiring <a href="https://careers.ghost.org/product-engineer-node-js/">Node.js Engineers</a> to work on Ghost full-time</p>
+<p align="center"><a href="https://ghost.org/"><img src="https://user-images.githubusercontent.com/120485/43974508-b64b2fe8-9cd2-11e8-8e58-707254b8817c.png" width="140px" alt="Ghost" /></a><br/><br/><span>Copyright (c) 2013-2021 Ghost Foundation - Released under the <a href='LICENSE'>MIT license</a><br/>Ghost and the Ghost Logo are trademarks of Ghost Foundation Ltd.<br/>Please see our <a href='https://ghost.org/trademark/'>trademark policy</a> for info on acceptable usage.</span><br/><br/><br/></p>
 
-&nbsp;
 
-<a href="https://ghost.org/"><img src="https://user-images.githubusercontent.com/120485/66918181-f88fdc80-f048-11e9-8135-d9c0e7b35ebc.png" alt="Fiercely independent, professional publishing. Ghost is the most popular open source, headless Node.js CMS which already works with all the tools you know and love." /></a>
+## How to Install Ghost
 
-<a href="https://ghost.org/pricing/"><img src="https://user-images.githubusercontent.com/120485/43995179-556d7620-9da1-11e8-8410-4b2ba48ea8d0.png" alt="Ghost(Pro)" width="165px" /></a>
+### Prerequisites
+1.	Node.js
+	- Recommended: 14.x(V14 Fermium LTS)
+	- Supported: 12.x (Node v12 Erbium LTS), 16.x (v16 Gallium LTS)
+	- Recommended Ideally: nvm(Node Version Manager)* Environments
+ 
+2.	Linux
+	- Recommended: Ubuntu(16.04, 18.04, 20.04 LTS)
+	- CentOS(6+)*
+		+ development mode only: [Local Installation with ghost-cli](https://ghost.org/docs/install/local/)
+		+ production mode available: [Source Installation*](https://ghost.org/docs/install/source/)(ghost-cli not need)
 
-The easiest way to get a production instance deployed is with our official **[Ghost(Pro)](https://ghost.org/pricing/)** managed service. It takes about 2 minutes to launch a new site with worldwide CDN, backups, security and maintenance all done for you.
+3.	Reverse Proxy Setup
+	- Apache: mod_proxy
+	- Nginx*: Basics 
 
-For most people this ends up being the best value option cause of [how much time it saves](https://ghost.org/docs/hosting/) — and 100% of revenue goes to the Ghost Foundation; funding the maintenance and further development of the project itself. So you’ll be supporting open source software *and* getting a great service!
+### Create Database ghost(MairaDB)
 
-If you prefer to run on your own infrastructure, we also offer official 1-off installs and managed support and maintenance plans via **[Ghost(Valet)](https://valet.ghost.org)** - which can save a substantial amount of developer time and resources.
+```sh
+mysql -p
+Enter password:
 
-&nbsp;
-
-# Quickstart Install
-
-If you want to run your own instance of Ghost, in most cases the best way is to use our **CLI tool**
-
-```
-npm install ghost-cli -g
+MariaDB [(none)]> create database <dbname>
+MariaDB [(none)]> create user <dbuser>@localhost identified by '<dbpassword>'
+MariaDB [(none)]> grant all privileges on <dbname>.* to ghost@localhost
+MariaDB [(none)]> flush privileges
 ```
 
-&nbsp;
+### Create Ghost Git Repository Clone
 
-Then, if installing locally add the `local` flag to get up and running in under a minute - [Local install docs](https://ghost.org/docs/install/local/)
+1.	Installation: ghost blog full package(core, admin, theme)
 
-```
-ghost install local
-```
+	```sh
+	# 서브모듈을 포함하여 Ghost 소스를 clone 한다. 
+	git clone --recurse-submodules git@github.com:TryGhost/Ghost
+	```
 
-&nbsp;
+2.	Configuration I: Ghost Core
 
-or on a server run the full install, including automatic SSL setup using LetsEncrypt - [Production install docs](https://ghost.org/docs/install/ubuntu/)
+	```sh
+	# 작업 디렉토리 이동
+	cd Ghost
+	
+	# origin remote를 upstream으로 변경: upstream <-> TryGhost/Ghost
+	git remote rename origin upstream
+	
+	# origin remote 추가: origin <-> <GithubUsername>/Ghost
+	git remote add origin git@github.com:<GithubUsername>/Ghost.git
 
-```
-ghost install
-```
+	# Guthub에 Ghost 레포지토리 생성: gh(Github CLI) 설치 필요 (https://cli.github.com/manual/gh)
+	gh repo create Ghost --public
+	
+	# push
+	git push -u origin main
+	```
+	
+3.	Configuration II: Ghost Admin
 
-&nbsp;
+	```sh
+	# 작업 디렉토리 이동
+	cd core/client
+	
+	# origin remote를 upstream으로 변경: upstream <-> TryGhost/Admin
+	git remote rename origin upstream
+	
+	# origin remote 추가: origin <-> <GithubUsername>/Ghost-Admin
+	git remote add origin git@github.com:<GithubUsername>/Ghost-Admin.git
+	
+	# Guthub에 Ghost 레포지토리 생성: gh(Github CLI) 설치 필요 (https://cli.github.com/manual/gh)
+	gh repo create Ghost-Admin --public
+	
+	# push
+	git push -u origin main	
+	```
 
-Check out our [official documentation](https://ghost.org/docs/) for more information about our [recommended hosting stack](https://ghost.org/docs/hosting/) & properly [upgrading Ghost](https://ghost.org/docs/update/), plus everything you need to develop your own Ghost [themes](https://ghost.org/docs/themes/) or work with [our API](https://ghost.org/docs/content-api/).
+4.	Up to date
 
-### Contributors & Advanced Developers
+	```sh
+	git submodule sync
+	git submodule update
+		
+	git diff --exit-code --quiet --ignore-submodules=untracked
+	git checkout main
+		
+	git pull upstream main
+	git pull origin main
+	
+	git push
+	```
+	
+### Installation &amp; Configuration
+1.	Installation(production mode)
 
-For anyone wishing to contribute to Ghost or to hack/customize core files we recommend following our full development setup guides: [Contributor Guide](https://ghost.org/docs/contributing/) | [Developer Setup](https://ghost.org/docs/install/source/) | [Admin Client Dev Guide](https://ghost.org/docs/install/source/#ghost-admin)
+	```sh
+	# 설치 디렉토리에서 install script 실행
+	npm install --production
+	
+	```
 
-&nbsp;
+3.	Configuring
+	-	blog url 설정: core/shared/config/defaults.json
 
-# Ghost Sponsors
+		```json
+		{
+			"url": "http(s)://<BlogHostDomain or BlogHostIp>",
+			"server": {
+				"host": "127.0.0.1",
+				"port": 2368,
+				"shutdownTimeout": 60000
+			},
+			"admin": {
+				"redirects": true
+			},
+			
+			[...skip...]
+		}
+		```
 
-We'd like to extend big thanks to our sponsors and partners who make Ghost possible. If you're interested in sponsoring Ghost and supporting the project, please check out our profile on [GitHub Sponsors](https://github.com/sponsors/TryGhost) :heart:
+	-	database 연결 설정: core/shared/config/env/config.production.json
+		
+		```json
+		{
+			"database": {
+				"client": "mysql",
+				"connection": {
+					"host"     : "<dbhost>",
+					"user"     : "<dbuser>",
+					"password" : "<dbpassword>",
+					"database" : "<dbname>"
+				}
+			},
 
-**[DigitalOcean](https://digitalocean.com)** | **[Fastly](https://www.fastly.com/)**
+			[...skip...]
+		}
+		```
 
-&nbsp;
+### Start Blog
 
-# Getting Help
+1.	start
 
-You can find answers to a huge variety of questions, along with a large community of helpful developers over on the [Ghost forum](https://forum.ghost.org/) - replies are generally very quick. **Ghost(Pro)** customers also have access to 24/7 email support.
+	```sh
+	npm start --production
 
-To stay up to date with all the latest news and product updates, make sure you [subscribe to our blog](https://ghost.org/blog/) — or you can always follow us [on Twitter](https://twitter.com/Ghost), if you prefer your updates bite-sized and facetious. :saxophone::turtle:
+	# or
 
-&nbsp;
+	node index.js
 
-# Copyright & License
+	# 다음과 같은 내용이 출력
+	[2021-12-15 15:53:38] INFO Ghost is running in production...
+	[2021-12-15 15:53:38] INFO Your site is now available on http://blog.kickscar.me/
+	[2021-12-15 15:53:38] INFO Ctrl+C to shut down
+	[2021-12-15 15:53:38] INFO Ghost server started in 0.274s
+	[2021-12-15 15:53:39] INFO Database is in a ready state.
+	[2021-12-15 15:53:39] INFO Ghost database ready in 0.414s
+	[2021-12-15 15:53:40] INFO Ghost booted in 1.487s
+	[2021-12-15 15:53:40] INFO Adding offloaded job to the queue
+	[2021-12-15 15:53:40] INFO Scheduling job update-check at 11 50 15 * * *. Next run on: Thu Dec 16 2021 15:50:11 GMT+0900 (대한민국 표준시)
+	[2021-12-15 15:53:40] INFO Ghost URL Service Ready in 1.806s
 
-Copyright (c) 2013-2021 Ghost Foundation - Released under the [MIT license](LICENSE). Ghost and the Ghost Logo are trademarks of Ghost Foundation Ltd. Please see our [trademark policy](https://ghost.org/trademark/) for info on acceptable usage.
+	```
+
+2.	test
+
+	```sh
+	curl -I localhost:2368
+	
+	# 응답 헤더
+	HTTP/1.1 200 OK
+	X-Powered-By: Express
+	Cache-Control: public, max-age=0
+	Content-Type: text/html; charset=utf-8
+	Content-Length: 24078
+	ETag: W/"5e0e-5Auo8SMsN0ylysove5kf06j/l5M"
+	Vary: Accept-Encoding
+	Date: Thu, 16 Dec 2021 10:09:02 GMT
+	Connection: keep-alive
+	Keep-Alive: timeout=5
+
+	[2021-12-16 19:09:02] INFO "HEAD /" 200 46ms
+	```
+
+### Configuring Nginx to Proxy Requests to Ghost
+1.	/etc/nginx/conf.d/ghost.conf
+
+	```sh
+	server {
+		listen       80;
+		server_name  <YourBlogDoamin>;
+
+		location / {
+			proxy_set_header Host $host;
+			proxy_set_header X-Real-IP $remote_addr;
+			proxy_set_header X-Forwarded-Proto $scheme;
+			proxy_set_header X-Real-IP $remote_addr;
+			proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+			proxy_pass http://127.0.0.1:2368;
+		}
+	}	
+	```
+
+2.	test configuration
+
+	```sh
+	nginx -T
+	
+	ginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+	nginx: configuration file /etc/nginx/nginx.conf test is successful
+	configuration file /etc/nginx/nginx.conf:
+	
+	[...skip...]
+	
+	```
+
+5.	server reload
+
+	```sh
+	nginx -s reload
+	
+	```
+	
+6.	test
+
+	```sh
+	curl -I <YourBlogDoamin>
+	
+	HTTP/1.1 200 OK
+	Server: nginx/1.21.4
+	Date: Fri, 17 Dec 2021 10:47:09 GMT
+	Content-Type: text/html; charset=utf-8
+	Content-Length: 24078
+	Connection: keep-alive
+	X-Powered-By: Express
+	Cache-Control: public, max-age=0
+	ETag: W/"5e0e-GmzbIOQPWhHhHXUCwHacZNoMhFU"
+	Vary: Accept-Encoding
+
+	[2021-12-17 19:47:09] INFO "HEAD /" 200 38ms
+	
+	```
+
+### Create a New User: Running Ghost as a Separate User
+
+
+### Running Ghost as a System Service
+1.	systemd unit file: ghost.service
+	
+	```
+	[Unit]
+	Description=Ghost
+	After=network.target
+
+	[Service]
+	Type=simple
+
+	WorkingDirectory=<YoutGostInstallDirectory>
+	User=ghost
+	Group=ghost
+
+	ExecStart=<YourNodexecutable> start --production
+	ExecStop=<YourNPMExecutable> stop --production
+	Restart=always
+	SyslogIdentifier=Ghost
+
+	[Install]
+	WantedBy=multi-user.target
+	```
+	
+3.	1
