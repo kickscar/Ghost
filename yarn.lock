@@ -5949,9 +5949,9 @@ grunt-update-submodules@0.4.1:
   resolved "https://registry.yarnpkg.com/grunt-update-submodules/-/grunt-update-submodules-0.4.1.tgz"
   integrity sha1-RsSF/mQTzAvdaYiqKAPE59mXw2Y=
 
-grunt@1.4.1:
+grunt@^1.4.1:
   version "1.4.1"
-  resolved "https://registry.npmjs.org/grunt/-/grunt-1.4.1.tgz"
+  resolved "https://registry.yarnpkg.com/grunt/-/grunt-1.4.1.tgz#7d1e17db1f9c8108777f7273d6b9359755576f50"
   integrity sha512-ZXIYXTsAVrA7sM+jZxjQdrBOAg7DyMUplOMhTaspMRExei+fD0BTwdWXnn0W5SXqhb/Q/nlkzXclSi3IH55PIA==
   dependencies:
     dateformat "~3.0.3"

@@ -98,7 +98,7 @@ MariaDB [(none)]> flush privileges
 
 	```sh
 	# 설치 디렉토리에서 install script 실행
-	npm install --production
+	yarn setup
 	
 	```
 
@@ -121,7 +121,7 @@ MariaDB [(none)]> flush privileges
 		}
 		```
 
-	-	database 연결 설정: core/shared/config/env/config.production.json
+	-	database 연결 설정: core/shared/config/env/config.development.json
 		
 		```json
 		{
@@ -144,7 +144,7 @@ MariaDB [(none)]> flush privileges
 1.	start
 
 	```sh
-	npm start --production
+	yarn start
 
 	# or
 
