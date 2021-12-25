@@ -20,7 +20,7 @@
   "contributors": "https://github.com/TryGhost/Ghost/graphs/contributors",
   "license": "MIT",
   "scripts": {
-    "start": "cross-env NODE_ENV=production node index --name $npm_package_name",
+    "start": "cross-env NODE_ENV=development node index --name $npm_package_name",
     "restart": "npm stop && npm start",
     "stop": "pkill -f $npm_package_name",
     "dev": "grunt dev",

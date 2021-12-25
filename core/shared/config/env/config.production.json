@@ -11,6 +11,19 @@
     "paths": {
         "contentPath": "content/"
     },
+    "privacy": {
+        "useRpcPing": false,
+        "useUpdateCheck": true
+    },
+    "useMinFiles": false,
+    "caching": {
+        "theme": {
+            "maxAge": 0
+        },
+        "admin": {
+            "maxAge": 0
+        }
+    },
     "logging": {
         "level": "info",
         "rotation": {

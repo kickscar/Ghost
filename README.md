@@ -13,7 +13,7 @@
 	- Recommended: Ubuntu(16.04, 18.04, 20.04 LTS)
 	- CentOS(6+)*
 		+ development mode only: [Local Installation with ghost-cli](https://ghost.org/docs/install/local/)
-		+ production mode available: [Source Installation*](https://ghost.org/docs/install/source/)(ghost-cli not need)
+		+ production mode available: [Source Installation*](https://ghost.org/docs/install/source/)(no need for ghost-cli)
 
 3.	Reverse Proxy Setup
 	- Apache: mod_proxy
